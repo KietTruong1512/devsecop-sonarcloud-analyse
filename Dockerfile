@@ -1,16 +1,12 @@
-# Example: docker build . -t dsvw && docker run -p 65412:65412 dsvw
+FROM python:3.7.2-alpine3.8
 
-FROM alpine:3.11
+WORKDIR /app
+COPY requirements.txt /app/
 
-RUN apk --no-cache add git python3 py-lxml \
-    && rm -rf /var/cache/apk/*
+RUN \
+    apk add --no-cache gcc musl-dev libffi libffi-dev && \
+    pip install -r requirements.txt
 
-WORKDIR /
-RUN git clone https://github.com/stamparm/DSVW
+COPY . /app
 
-WORKDIR /DSVW
-RUN sed -i 's/127.0.0.1/0.0.0.0/g' dsvw.py
-
-EXPOSE 65412
-
-CMD ["python3", "dsvw.py"]
+ENTRYPOINT ["python", "app.py"]
